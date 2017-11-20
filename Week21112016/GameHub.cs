@@ -41,5 +41,10 @@ namespace Week21112016
         {
             Clients.Caller.joined(WorldX,WorldY);
         }
+
+        public void Moved(string PlayerID, Position p)
+        {
+            Clients.All.Moved(PlayerID, p);
+        }
     }
 }

@@ -8,6 +8,8 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Audio;
 using GameData;
+using Microsoft.AspNet.SignalR.Client;
+using CameraNS;
 
 namespace Sprites
 {
@@ -29,6 +31,7 @@ namespace Sprites
         SpriteFont font;
         public PlayerData playerData;
         Position oldPosition;
+        Vector2 PreviousPosition;
 
         public int Score
         {
@@ -52,7 +55,17 @@ namespace Sprites
             // link in the playerData. Eventually this will be created on the server and sent down.
             playerData = new PlayerData { playerPosition = new Position { X = (int)pos.X, Y = (int)pos.Y } };
             oldPosition = playerData.playerPosition;
+            PreviousPosition = pos;
+            Action<string, Position> moved = mMoved;
+            Game.Services.GetService<IHubProxy>().On("Moved",moved);
+        }
 
+        private void mMoved(string playerID, Position NewPlayerPosition)
+        {
+            if(playerData.playerID == playerID)
+                playerData.playerPosition = NewPlayerPosition;
+            playerData.header = playerID + " Moved to " + NewPlayerPosition.X.ToString() + "," + NewPlayerPosition.Y.ToString();
+            
         }
 
         public override void Update(GameTime gameTime)
@@ -84,9 +97,29 @@ namespace Sprites
             }
             
             SpriteImage = _textures[(int)_direction];
-            // Update internal player data for messages
-            oldPosition = playerData.playerPosition;
-            playerData = new PlayerData { playerPosition = new Position { X = (int)Position.X, Y = (int)Position.Y } };
+            if (Position != PreviousPosition)
+            {
+                // Update internal player data for messages
+                oldPosition = playerData.playerPosition;
+                playerData = new PlayerData { playerPosition = new Position { X = (int)Position.X, Y = (int)Position.Y } };
+                var proxy = Game.Services.GetService<IHubProxy>();
+
+                proxy.Invoke("Moved", new object[] 
+                { playerData.playerID,
+                    new Position { X = (int)Position.X, Y = (int)Position.Y } });
+
+            }
+            PreviousPosition = Position;
+        }
+
+        public override void Draw(GameTime gameTime)
+        {
+            base.Draw(gameTime);
+            SpriteBatch spriteBatch = Game.Services.GetService<SpriteBatch>();
+            SpriteFont font = Game.Services.GetService<SpriteFont>();
+            spriteBatch.Begin(SpriteSortMode.Immediate, null, null, null, null, null, Camera.CurrentCameraTranslation);
+            spriteBatch.DrawString(font, playerData.header, Position, Color.White);
+            spriteBatch.End();
             
         }
     }

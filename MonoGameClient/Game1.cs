@@ -43,7 +43,9 @@ namespace MonoGameClient
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-            serverConnection = new HubConnection("http://localhost:3566/");
+            // Azure endpoint http://ppgameserver.azurewebsites.net/
+            //serverConnection = new HubConnection("http://localhost:3566/");
+            serverConnection = new HubConnection("http://ppgameserver.azurewebsites.net/");
             serverConnection.StateChanged += ServerConnection_StateChanged;
             proxy = serverConnection.CreateHubProxy("GameHub");
             connectionMessage = string.Empty;
@@ -78,7 +80,8 @@ namespace MonoGameClient
             Action<int, int> joined = cJoined;
             proxy.On("joined", joined);
             proxy.Invoke("join");
-                        
+            Services.AddService(proxy);
+                                            
         }
 
         private void cJoined(int arg1, int arg2)
@@ -112,6 +115,7 @@ namespace MonoGameClient
             spriteBatch = new SpriteBatch(GraphicsDevice);
             Services.AddService(spriteBatch);
             messageFont = Content.Load<SpriteFont>(@"Fonts\ScoreFont");
+            Services.AddService<SpriteFont>(Content.Load<SpriteFont>(@"Fonts\PlayerFont"));
             backGround = Content.Load<Texture2D>(@"Textures\background");
             // TODO: use this.Content to load your game content here
         }
