@@ -14,8 +14,9 @@ namespace MonoGameClient
     {
         public PlayerData Data { get; set; }
 
-        public Opponent(Game game, Texture2D texture2D, Vector2 position, int frameCount):base(game, texture2D, position, frameCount)
+        public Opponent(Game game, Texture2D texture2D, PlayerData playerData, int frameCount):base(game, texture2D, new Vector2(playerData.playerPosition.X, playerData.playerPosition.Y), frameCount)
         {
+            Data = playerData;
             PlayerColor = Color.Red;
             game.Components.Add(this);
         }

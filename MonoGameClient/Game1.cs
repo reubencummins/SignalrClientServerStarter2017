@@ -8,6 +8,7 @@ using Sprites;
 using Microsoft.Xna.Framework.Audio;
 using CameraNS;
 using GameData;
+using System.Collections.Generic;
 
 namespace MonoGameClient
 {
@@ -24,10 +25,13 @@ namespace MonoGameClient
         Vector2 worldCoords;
         SpriteFont messageFont;
         Texture2D backGround;
+        Texture2D opponentSprite;
+        Texture2D collectableSprite;
         private string connectionMessage;
         private bool Connected;
         private Rectangle worldRect;
         private bool Joined;
+        private List<string> messages;
 
         public Game1()
         {
@@ -50,6 +54,7 @@ namespace MonoGameClient
             serverConnection.StateChanged += ServerConnection_StateChanged;
             proxy = serverConnection.CreateHubProxy("GameHub");
             connectionMessage = string.Empty;
+            messages = new List<string>();
             serverConnection.Start();
             base.Initialize();
         }
@@ -82,15 +87,51 @@ namespace MonoGameClient
             proxy.On("joined", joined);
             proxy.Invoke("join");
             Action<string, Position> moved = opponentMoved;
-            
+            proxy.On("Moved", moved);
+            Action<string> message = receiveMessage;
+            proxy.On("message", message);
+            Action<PlayerData> opponentJoined = opJoined;
+            proxy.On("OpponentJoined", opponentJoined);
+            Action<CollectableData> collectables = spawnCollectables;
+            proxy.On("spawnCollectables", collectables);
+
+
 
             Services.AddService(proxy);
-                                            
+        }
+
+        private void spawnCollectables(List<CollectableData> data)
+        {
+            foreach (CollectableData col in data)
+            {
+                Components.Add(new Collectable(this, collectableSprite, new Vector2(col.position.X, col.position.Y), 1));
+            }
+        }
+
+        private void opJoined(PlayerData opponentData)
+        {
+            Opponent op = new Opponent(this, opponentSprite, opponentData, 1);
+            op.Data = opponentData;
+        }
+
+        private void receiveMessage(string obj)
+        {
+            messages.Add(obj);
         }
 
         private void opponentMoved(string opponentID, Position opponentPosition)
         {
-            Opponent op = Components.
+            foreach (GameComponent gc in Components)
+            {
+                if (gc is Opponent)
+                {
+                    Opponent op = (Opponent)gc;
+                    if (op.Data.playerID==opponentID)
+                    {
+                        op.Data.playerPosition = opponentPosition;
+                    }
+                }
+            }
         }
 
         private void cJoined(int arg1, int arg2)

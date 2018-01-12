@@ -40,11 +40,18 @@ namespace Week21112016
         public void join()
         {
             Clients.Caller.joined(WorldX,WorldY);
+            Clients.Others.OpponentJoined();
+            Clients.All.SpawnCollectables(Collectables);
         }
 
         public void Moved(string PlayerID, Position p)
         {
             Clients.All.Moved(PlayerID, p);
+        }
+
+        public void Message(string messageText)
+        {
+            Clients.All.Message(messageText);
         }
     }
 }
