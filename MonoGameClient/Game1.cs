@@ -92,7 +92,7 @@ namespace MonoGameClient
             proxy.On("message", message);
             Action<PlayerData> opponentJoined = opJoined;
             proxy.On("OpponentJoined", opponentJoined);
-            Action<CollectableData> collectables = spawnCollectables;
+            Action<List<CollectableData>> collectables = spawnCollectables;
             proxy.On("spawnCollectables", collectables);
 
 
@@ -111,7 +111,6 @@ namespace MonoGameClient
         private void opJoined(PlayerData opponentData)
         {
             Opponent op = new Opponent(this, opponentSprite, opponentData, 1);
-            op.Data = opponentData;
         }
 
         private void receiveMessage(string obj)

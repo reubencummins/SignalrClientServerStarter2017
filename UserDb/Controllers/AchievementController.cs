@@ -56,5 +56,11 @@ namespace UserDb.Controllers
                 user.PlayerAchievements.Add(new PlayerAchievement() { PlayerID = UserID, AchievementID = NewAchievementID });
             }
         }
+
+        public void UserScore([FromBody] string userID, [FromBody] int newScore, [FromBody] int gameID)
+        {
+            var Game = db.Games.FirstOrDefault(g => g.GameID == gameID);
+            Game.Scores.Add(new GameScore() { PlayerID = userID, GameID = gameID, score = newScore });
+        }
     }
 }
