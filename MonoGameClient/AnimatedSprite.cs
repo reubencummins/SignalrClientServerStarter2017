@@ -14,7 +14,7 @@ namespace Sprites
     {
         //sprite texture and position
         Texture2D spriteImage;
-
+        public Color PlayerColor { get; set; }
 
 
 
@@ -99,7 +99,7 @@ namespace Sprites
             spriteWidth = spriteImage.Width / framecount;
             _effect = SpriteEffects.None;
             BoundingRect = new Rectangle((int)this.Position.X, (int)this.Position.Y, this.spriteWidth, this.spriteHeight);
-
+            PlayerColor = Color.White;
         }
 
 
@@ -162,7 +162,7 @@ namespace Sprites
             if (spriteBatch == null) return;
             spriteBatch.Begin(SpriteSortMode.Immediate, null, null, null, null, null, Camera.CurrentCameraTranslation);
             spriteBatch.Draw(spriteImage, Position, 
-                        sourceRectangle, Color.White, 0f, Vector2.Zero, 1.0f, _effect, 0f);
+                        sourceRectangle, PlayerColor, 0f, Vector2.Zero, 1.0f, _effect, 0f);
             spriteBatch.End();
 
             base.Draw(gameTime);

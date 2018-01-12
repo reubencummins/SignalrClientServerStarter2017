@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework.Input;
 using Sprites;
 using Microsoft.Xna.Framework.Audio;
 using CameraNS;
+using GameData;
 
 namespace MonoGameClient
 {
@@ -80,8 +81,16 @@ namespace MonoGameClient
             Action<int, int> joined = cJoined;
             proxy.On("joined", joined);
             proxy.Invoke("join");
+            Action<string, Position> moved = opponentMoved;
+            
+
             Services.AddService(proxy);
                                             
+        }
+
+        private void opponentMoved(string opponentID, Position opponentPosition)
+        {
+            Opponent op = Components.
         }
 
         private void cJoined(int arg1, int arg2)
